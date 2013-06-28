@@ -57,7 +57,7 @@ class CompileRest(PageCompiler):
 
     name = "rest"
 
-    def compile_html(self, source, dest, is_two_file=True):
+    def compile_html(self, source, dest, post=None):
         """Compile reSt into HTML."""
         if not has_docutils:
             raise Exception('To build this site, you need to install the '
@@ -70,7 +70,7 @@ class CompileRest(PageCompiler):
         with codecs.open(dest, "w+", "utf8") as out_file:
             with codecs.open(source, "r", "utf8") as in_file:
                 data = in_file.read()
-                if not is_two_file:
+                if not getattr(post, 'is_two_file', True):
                     data = data.split('\n\n', 1)[-1]
                 output, error_level, deps = rst2html(
                     data, settings_overrides={

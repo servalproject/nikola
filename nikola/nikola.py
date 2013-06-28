@@ -141,7 +141,8 @@ class Nikola(object):
                 "bbcode": ('.bb',),
                 "wiki": ('.wiki',),
                 "ipynb": ('.ipynb',),
-                "html": ('.html', '.htm')
+                "html": ('.html', '.htm'),
+                "mako": ('.mako'),
             },
             'POST_PAGES': (
                 ("posts/*.txt", "posts", "post.tmpl", True),
@@ -397,11 +398,11 @@ class Nikola(object):
         local_context["template_name"] = template_name
         local_context.update(self.GLOBAL_CONTEXT)
         local_context.update(context)
-        data = self.template_system.render_template(
-            template_name, None, local_context)
+        data = self.template_system.render_template(template_name, None, local_context)
+        return self.write_output_file(data, output_name, context)
 
-        assert output_name.startswith(
-            self.config["OUTPUT_FOLDER"])
+    def write_output_file(self, data, output_name, context):
+        assert output_name.startswith(self.config["OUTPUT_FOLDER"])
         url_part = output_name[len(self.config["OUTPUT_FOLDER"]) + 1:]
 
         # Treat our site as if output/ is "/" and then make all URLs relative,
@@ -736,6 +737,7 @@ class Nikola(object):
         context['description'] = post.description(lang)
         context['permalink'] = post.permalink(lang)
         context['page_list'] = self.pages
+        context['timeline'] = self.timeline
         if post.use_in_feeds:
             context['enable_comments'] = True
         else:

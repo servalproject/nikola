@@ -1,0 +1,9 @@
+[Core]
+Name = mako
+Module = compile_mako
+
+[Documentation]
+Author = Andrew Bettison
+Version = 0.1
+Website = http://nikola.ralsina.com.ar
+Description = Compile a Mako template into HTML

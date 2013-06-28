@@ -1,4 +1,4 @@
-# Copyright (c) 2013 Chris Lee
+# Copyright (c) 2013 Andrew Bettison
 
 # Permission is hereby granted, free of charge, to any
 # person obtaining a copy of this software and associated
@@ -22,51 +22,36 @@
 # OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-"""Implementation of compile_html based on misaka."""
+"""Implementation of compile_mako for HTML Mako template files."""
 
-from __future__ import unicode_literals
-
-import codecs
 import os
-
-try:
-    import misaka
-
-except ImportError:
-    misaka = None  # NOQA
-    nikola_extension = None
-    gist_extension = None
-    podcast_extension = None
+import shutil
+import codecs
 
 from nikola.plugin_categories import PageCompiler
+import mako.template
 
+class CompileMako(PageCompiler):
+    """Compile template into HTML."""
 
-class CompileMarkdown(PageCompiler):
-    """Compile markdown into HTML."""
-
-    name = "markdown"
-
-    def __init__(self, *args, **kwargs):
-        super(CompileMarkdown, self).__init__(*args, **kwargs)
-        if misaka is not None:
-            self.ext = misaka.EXT_FENCED_CODE | misaka.EXT_STRIKETHROUGH | \
-                misaka.EXT_AUTOLINK | misaka.EXT_NO_INTRA_EMPHASIS
+    name = "mako"
 
     def compile_html(self, source, dest, post=None):
-        if misaka is None:
-            raise Exception('To build this site, you need to install the '
-                            '"misaka" package.')
+        local_context = {}
+        local_context["timeline"] = self.site.timeline
+        if post is not None:
+            local_context["post"] = post
+        local_context["source_path"] = source
+        local_context.update(self.site.GLOBAL_CONTEXT)
         try:
             os.makedirs(os.path.dirname(dest))
-        except:
+        except Exception:
             pass
-        with codecs.open(dest, "w+", "utf8") as out_file:
-            with codecs.open(source, "r", "utf8") as in_file:
-                data = in_file.read()
-            if not getattr(post, 'is_two_file', True):
-                data = data.split('\n\n', 1)[-1]
-            output = misaka.html(data, extensions=self.ext)
-            out_file.write(output)
+        tmpl = mako.template.Template(filename=source, output_encoding='utf-8')
+        data = tmpl.render(**local_context)
+        with open(dest, "wb+") as dest_file:
+            dest_file.write(data)
+        return True
 
     def create_post(self, path, onefile=False, **kw):
         metadata = {}
@@ -81,4 +66,4 @@ class CompileMarkdown(PageCompiler):
                 for k, v in metadata.items():
                     fd.write('.. {0}: {1}\n'.format(k, v))
                 fd.write('-->\n\n')
-            fd.write("\nWrite your post here.")
+            fd.write("\n<p>This is ${source_path}.  Write your post here.</p>")

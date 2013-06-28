@@ -74,7 +74,7 @@ class RenderPosts(Task):
                     'file_dep': post.fragment_deps(lang),
                     'targets': [dest],
                     'actions': [(self.site.get_compiler(post.source_path).compile_html,
-                                 [source, dest, post.is_two_file])],
+                                 [source, dest, post])],
                     'clean': True,
                     'uptodate': [utils.config_changed(deps_dict)],
                 }

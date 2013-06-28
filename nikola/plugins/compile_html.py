@@ -36,7 +36,7 @@ class CompileHtml(PageCompiler):
 
     name = "html"
 
-    def compile_html(self, source, dest, is_two_file=True):
+    def compile_html(self, source, dest, post=None):
         try:
             os.makedirs(os.path.dirname(dest))
         except Exception:

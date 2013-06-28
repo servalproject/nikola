@@ -42,7 +42,7 @@ class CompileTextile(PageCompiler):
 
     name = "wiki"
 
-    def compile_html(self, source, dest, is_two_file=True):
+    def compile_html(self, source, dest, post=None):
         if creole is None:
             raise Exception('To build this site, you need to install the '
                             '"creole" package.')

@@ -57,7 +57,7 @@ class CompileMarkdown(PageCompiler):
     extensions = [gist_extension, nikola_extension, podcast_extension]
     site = None
 
-    def compile_html(self, source, dest, is_two_file=True):
+    def compile_html(self, source, dest, post=None):
         if markdown is None:
             raise Exception('To build this site, you need to install the '
                             '"markdown" package.')
@@ -69,7 +69,7 @@ class CompileMarkdown(PageCompiler):
         with codecs.open(dest, "w+", "utf8") as out_file:
             with codecs.open(source, "r", "utf8") as in_file:
                 data = in_file.read()
-            if not is_two_file:
+            if not getattr(post, 'is_two_file', True):
                 data = data.split('\n\n', 1)[-1]
             output = markdown(data, self.extensions)
             out_file.write(output)
