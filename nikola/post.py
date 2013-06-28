@@ -62,6 +62,7 @@ class Post(object):
         self.base_url = base_url
         self.is_draft = False
         self.is_retired = False
+        self.is_frontpage = False
         self.is_mathjax = False
         self.strip_indexes = strip_indexes
         self.index_file = index_file
@@ -119,6 +120,7 @@ class Post(object):
 
         is_draft = False
         is_retired = False
+        is_frontpage = False
         self._tags = {}
         for lang in self.translated_to:
             self._tags[lang] = [x.strip() for x in self.meta[lang]['tags'].split(',')]
@@ -129,10 +131,13 @@ class Post(object):
             if 'retired' in self._tags[lang]:
                 is_retired = True
                 self._tags[lang].remove('retired')
-
+            if 'frontpage' in self._tags[lang]:
+                is_frontpage = True
+                self._tags[lang].remove('frontpage')
         # While draft comes from the tags, it's not really a tag
         self.is_draft = is_draft
         self.is_retired = is_retired
+        self.is_frontpage = is_frontpage
         self.use_in_feeds = use_in_feeds and not is_draft and not is_retired \
             and not self.publish_later
 
